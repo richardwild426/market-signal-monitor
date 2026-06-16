@@ -7,10 +7,6 @@ description: |
 version: 1.0.0
 author: Richard Wild
 license: MIT
-metadata:
-  hermes:
-    tags: [a-stock, market-signal, trading, data-science, quantitative]
-    related_skills: [a-stock-data, etf-weekly-report, stock-review]
 ---
 
 # A股盘面信号监控系统
@@ -30,16 +26,16 @@ metadata:
 
 **Don't use for:**
 
-- 个股分析（使用 `a-stock-data`）
-- 股票复盘视频分析（使用 `stock-review`）
-- ETF 调仓策略（使用 `etf-weekly-report`）
+- 个股分析
+- 股票复盘视频分析
+- ETF 调仓策略
 
 ## 快速开始
 
 ### 环境要求
 
-- Python 3.11+（推荐；3.9 的 LibreSSL 可能导致部分 HTTPS 站点 SSL 握手失败）
-- 依赖：`requests`（唯一第三方依赖）
+- Python 3.11+
+- 依赖：`requests`
 
 ```bash
 pip install requests
@@ -165,22 +161,3 @@ def evaluate_breadth(breadth: dict) -> dict:
 - ⚪不及格/无数据: {N}个
 {综合判断}
 ```
-
-## Common Pitfalls
-
-详见 [`references/common-pitfalls.md`](references/common-pitfalls.md)
-
-核心要点：
-
-1. **VPN/代理导致 SSL 断连** — 使用 Python 3.11+，脚本已内置 3 次重试
-2. **东财限流** — 已内置 `em_get()` 统一限流（间隔≥1s + 随机抖动）
-3. **开盘初期数据为 0** — 09:30–09:35 涨跌家数尚未刷新，正常现象
-4. **腾讯指数代码前缀** — 上证=sh，深证=sz，已在 `INDEX_MAP` 中处理
-
-## Verification Checklist
-
-- [ ] Python 3.11+ 可用
-- [ ] `requests` 已安装
-- [ ] `python3 scripts/market-signal-monitor.py` 能正常输出报告
-- [ ] 飞书 Webhook URL 已配置（如需推送）
-- [ ] VPN 分流规则已将 `qt.gtimg.cn` 加入直连（如使用代理）
