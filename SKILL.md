@@ -3,8 +3,8 @@ name: market-signal-monitor
 description: |
   A股盘面信号监控系统 — 基于「看信号，做决策」框架，定时采集盘面数据并评估10个信号维度。
   涵盖盘面结构（指数共振/权重/题材/涨跌）、资金信号（北向/成交量/主动性买盘/融资余额）、IF股指期货。
-  支持终端输出和飞书 Webhook 推送。所有数据源均为公开 API，无需 API Key。
-version: 1.0.0
+  数据源层使用 a-stock-data，支持终端输出和飞书 Webhook 推送。
+version: 2.0.0
 author: Richard Wild
 license: MIT
 ---
@@ -15,7 +15,7 @@ license: MIT
 
 基于「看信号，做决策」思维导图，在交易日定时采集盘面数据，评估 10 个信号维度，生成辅助决策报告。
 
-数据源全部为公开 HTTP API（腾讯财经、东财 push2、同花顺 hsgtApi、东财 datacenter），无需任何 API Key。
+数据采集层使用 [a-stock-data](https://github.com/simonlin1212/a-stock-data)（V3.2.2），所有数据源均为公开 HTTP API，无需 API Key。
 
 ## When to Use
 
@@ -95,17 +95,20 @@ FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_TOKEN" \
 其他             → 偏弱：谨慎观望
 ```
 
-## 数据源
+## 数据源映射
 
-| 数据 | 来源 | 封 IP 风险 |
-|------|------|-----------|
-| 指数行情 | 腾讯财经 `qt.gtimg.cn` | 极低 |
-| 涨跌家数/涨跌停 | 东财 `push2.eastmoney.com` | 低 |
-| 北向资金 | 同花顺 `data.hexin.cn` | 极低 |
-| 主力资金流 | 东财 `push2.eastmoney.com` | 低 |
-| 融资余额 | 东财 `datacenter-web.eastmoney.com` | 低 |
-| 题材归因 | 同花顺 `zx.10jqka.com.cn` | 极低 |
-| 创业板权重 | 腾讯财经 | 极低 |
+本项目数据采集层来自 [a-stock-data](https://github.com/simonlin1212/a-stock-data)，映射关系：
+
+| 信号 | 数据函数 | a-stock-data 端点 |
+|------|----------|-------------------|
+| 指数行情 | `tencent_quote()` | §1.2 腾讯财经 |
+| 涨跌家数 | `get_market_breadth()` | §3.7 东财 push2 (`em_get`) |
+| 北向资金 | `hsgt_realtime()` | §3.2 同花顺 hsgtApi |
+| 主力资金流 | `eastmoney_fund_flow_minute()` | §3.4 东财 push2 |
+| 成交量 | `tencent_quote()` | §1.2 腾讯财经 |
+| 融资余额 | `eastmoney_datacenter()` | §4.1 东财 datacenter |
+| 题材归因 | `ths_hot_reason()` | §3.1 同花顺热点 |
+| IF 期货 | `get_if_futures()` | 东财 push2 |
 
 ## 自定义修改
 
@@ -126,8 +129,8 @@ def evaluate_breadth(breadth: dict) -> dict:
 
 ### 添加新信号
 
-1. 新增数据采集函数
-2. 新增信号评估函数
+1. 在 `lib/data_source.py` 中新增数据采集函数
+2. 在 `scripts/market-signal-monitor.py` 中新增信号评估函数
 3. 在 `generate_report()` 中调用并加入信号列表
 
 ## 报告输出格式

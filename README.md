@@ -2,6 +2,8 @@
 
 基于「看信号，做决策」框架的 A 股盘面信号自动采集与评估系统。每个交易日定时采集 10 个维度的盘面数据，生成量化决策报告。
 
+数据采集层使用 [a-stock-data](https://github.com/simonlin1212/a-stock-data)。
+
 ## 快速开始
 
 ```bash
@@ -31,12 +33,29 @@ FEISHU_WEBHOOK_URL="https://open.feishu.cn/open-apis/bot/v2/hook/YOUR_TOKEN" \
 ```
 market-signal-monitor/
 ├── SKILL.md                          # 技能定义（完整文档）
+├── lib/
+│   ├── __init__.py
+│   └── data_source.py                # 数据采集层（提取自 a-stock-data）
 ├── scripts/
-│   └── market-signal-monitor.py      # 主程序
+│   └── market-signal-monitor.py      # 信号评估 + 报告生成
 ├── README.md                         # 本文件
 ├── LICENSE                           # MIT
 └── .gitignore
 ```
+
+## 数据源
+
+所有数据采集函数提取自 [a-stock-data V3.2.2](https://github.com/simonlin1212/a-stock-data)：
+
+| 数据 | 函数 | 来源 |
+|------|------|------|
+| 指数行情 | `tencent_quote()` | 腾讯财经 |
+| 涨跌家数 | `get_market_breadth()` | 东财 push2 |
+| 北向资金 | `hsgt_realtime()` | 同花顺 hsgtApi |
+| 主力资金流 | `eastmoney_fund_flow_minute()` | 东财 push2 |
+| 融资余额 | `eastmoney_datacenter()` | 东财 datacenter |
+| 题材归因 | `ths_hot_reason()` | 同花顺热点 |
+| IF 期货 | `get_if_futures()` | 东财 push2 |
 
 ## License
 
